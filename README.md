@@ -69,3 +69,55 @@ Mysql死锁技术研究
                     方法实现。
                  5：每一个事务必须一次就将所使用到的数据全部加锁，否则不允许使用。
 </pre>
+
+![](https://i.imgur.com/I4wuTuO.png)
+
+![](https://i.imgur.com/DStk33J.png)
+
+<pre>
+查询工具：
+ 
+        锁等待的对应关系
+        show VARIABLES like "%innodb_locks_wait%";
+        当前出现的锁
+        show VARIABLES like "%innodb_locks%"
+        查询当前运行的事务
+        show VARIABLES like "%innodb_trx%"
+</pre>
+
+
+![](https://i.imgur.com/hi6xnov.png)
+
+<pre>
+第一步：
+        show processlist
+</pre>
+
+<pre>
+第二步：
+        获取SQL的锁状态
+
+        select * from INNODB_LOCKS a inner join INNODB_TRX b on a.lock_trx_id=b.trx_id and trx_mysql_thread_id=线程id
+
+        线程ID为第一步获取的线程ID
+</pre>
+
+<pre>
+第三步：
+
+      select * from innodb_lock_waits where requesting_trx_id=75CB26E5
+
+      requesting_trx_id 为第二步查询中得到的 lock_trx_id
+</pre>
+
+
+<pre>
+第四步：
+
+      select * from innodb_trx where lock_trx_id=75CB26E5 获取sql语句与线程id
+
+      lock_trx_id为第二步获取的 lock_trx_id
+</pre>
+
+
+
